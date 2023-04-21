@@ -50,10 +50,24 @@ class BoggleAppTestCase(TestCase):
 
     def test_score_word(self):
         """Test if word is valid"""
+        global games
+        game = games[0]
 
         with self.client as client:
-            response = client.post('/api/score-word',
-                                   data={''})
+            start_response = client.post('/api/new-game')
+            start_json = start_response.get_json()
+            start_json_gameId = start_json["gameId"]
+            start_json_board = start_json["board"]
+
+        game.board[0] = [2,4,7,7,8]
+
+            score_response = client.post('/api/score-word',
+                                   json={ "word" : "DOG", 'game_id' : start_json_gameId})
+
+
+            data = response.get_json()
+
+            self
             # make a post request to /api/new-game
             # get the response body as json using .get_json()
             # find that game in the dictionary of games (imported from app.py above)
@@ -63,3 +77,14 @@ class BoggleAppTestCase(TestCase):
             # test to see that a valid word on the altered board returns {'result': 'ok'}
             # test to see that a valid word not on the altered board returns {'result': 'not-on-board'}
             # test to see that an invalid word returns {'result': 'not-word'}
+
+
+            def test_color_submit_json(self):
+  """test an AJAX request sending JSON to a server"""
+
+    with app.test_client() as client:
+      resp = client.post('/fav-color',
+                        json={'color': 'blue'})
+      data = resp.get_json()
+
+      self.assertEqual({'message': 'blue is best!'}, data)
