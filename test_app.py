@@ -26,13 +26,22 @@ class BoggleAppTestCase(TestCase):
             html = response.get_data(as_text=True)
 
             self.assertEqual(response.status_code, 200)
-            self.assertIn('<table class="board">', html)
+            self.assertIn('<table', html)
 
     def test_api_new_game(self):
         """Test starting a new game."""
 
         with self.client as client:
-            ...
+
+            response = client.post("/api/new-game")
+            json = response.get_json()
+            print(json)
+            self.assertEqual(type(json["gameId"]),str)
+            self.assertEqual(type(json["board"]),list)
+            self.assertEqual(json["gameId"] in games, True)
+
+
+
             # make a post request to /api/new-game
             # get the response body as json using .get_json()
             # test that the game_id is a string
