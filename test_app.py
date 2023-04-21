@@ -50,24 +50,36 @@ class BoggleAppTestCase(TestCase):
 
     def test_score_word(self):
         """Test if word is valid"""
-        global games
-        game = games[0]
 
         with self.client as client:
+            # simulate new game POST request and extract values
             start_response = client.post('/api/new-game')
             start_json = start_response.get_json()
             start_json_gameId = start_json["gameId"]
-            start_json_board = start_json["board"]
 
-        game.board[0] = [2,4,7,7,8]
-
-            score_response = client.post('/api/score-word',
-                                   json={ "word" : "DOG", 'game_id' : start_json_gameId})
+            # extract test game from games dictionary and manually adjust board
+            #TODO: some will say hard-code grid explictly
+            games[start_json_gameId].board = [list('APPLE') for row in range(5)]
 
 
-            data = response.get_json()
+            score_response_ok = client.post('/api/score-word',
+                                   json={ "word" : "APPLE",
+                                         'game_id' : start_json_gameId}).get_json()
 
-            self
+            score_response_not_board = client.post('/api/score-word',
+                                   json={ "word" : "UPHOLD",
+                                         'game_id' : start_json_gameId}).get_json()
+
+            score_response_not_word = client.post('/api/score-word',
+                                   json={ "word" : "XXX",
+                                   'game_id' : start_json_gameId}).get_json()
+
+
+            self.assertEqual(score_response_ok, {"result": "ok"})
+            self.assertEqual(score_response_not_board, {"result": "not-on-board"})
+            self.assertEqual(score_response_not_word, {"result": "not-word"})
+
+
             # make a post request to /api/new-game
             # get the response body as json using .get_json()
             # find that game in the dictionary of games (imported from app.py above)
@@ -78,13 +90,3 @@ class BoggleAppTestCase(TestCase):
             # test to see that a valid word not on the altered board returns {'result': 'not-on-board'}
             # test to see that an invalid word returns {'result': 'not-word'}
 
-
-            def test_color_submit_json(self):
-  """test an AJAX request sending JSON to a server"""
-
-    with app.test_client() as client:
-      resp = client.post('/fav-color',
-                        json={'color': 'blue'})
-      data = resp.get_json()
-
-      self.assertEqual({'message': 'blue is best!'}, data)

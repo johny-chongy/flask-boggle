@@ -34,11 +34,12 @@ def score_word():
     """Scores word and return JSON: {result: "result-str"}"""
 
     game_id = request.json["game_id"]
-    word = request.json["word"]
+    word = request.json["word"].upper()
     current_game = games[game_id]
 
     if current_game.is_word_in_word_list(word):
         if current_game.check_word_on_board(word):
+            # TODO: just return explicitly
             result_value = "ok"
         else:
             result_value = "not-on-board"
